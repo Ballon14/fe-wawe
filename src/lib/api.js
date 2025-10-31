@@ -1,23 +1,26 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://192.168.0.107:3000'
 const isDev = import.meta.env.DEV
 
+function getTokenHeader() {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: 'Bearer ' + token } : {}
+}
+
 export async function apiGet(path, options = {}) {
-  // Jika dalam dev mode dan path dimulai dengan /api, gunakan relative path untuk proxy
-  // Jika production atau path tidak dimulai dengan /api, gunakan API_BASE_URL
   let url
   if (path.startsWith('http')) {
     url = path
   } else if (isDev && path.startsWith('/api')) {
-    url = path // Gunakan relative path untuk Vite proxy
+    url = path // Vite proxy
   } else {
     url = `${API_BASE_URL}${path}`
   }
-  
   try {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        ...getTokenHeader(), // tambahkan otomatis JWT
         ...(options.headers || {}),
       },
       credentials: options.credentials ?? 'include',
@@ -28,7 +31,6 @@ export async function apiGet(path, options = {}) {
     }
     return response.json()
   } catch (error) {
-    // Tangkap network error (failed to fetch)
     if (error instanceof TypeError && error.message.includes('fetch')) {
       throw new Error(`Tidak dapat terhubung ke server. Pastikan server API berjalan di ${isDev && path.startsWith('/api') ? 'proxy target' : API_BASE_URL}`)
     }
@@ -37,22 +39,20 @@ export async function apiGet(path, options = {}) {
 }
 
 export async function apiPost(path, body, options = {}) {
-  // Jika dalam dev mode dan path dimulai dengan /api, gunakan relative path untuk proxy
-  // Jika production atau path tidak dimulai dengan /api, gunakan API_BASE_URL
   let url
   if (path.startsWith('http')) {
     url = path
   } else if (isDev && path.startsWith('/api')) {
-    url = path // Gunakan relative path untuk Vite proxy
+    url = path
   } else {
     url = `${API_BASE_URL}${path}`
   }
-  
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...getTokenHeader(), // tambahkan otomatis JWT
         ...(options.headers || {}),
       },
       body: JSON.stringify(body),
@@ -65,12 +65,10 @@ export async function apiPost(path, body, options = {}) {
     try {
       return await response.json()
     } catch (error) {
-      // Jika response tidak valid JSON, return empty object
       console.warn('Response tidak valid JSON:', error)
       return {}
     }
   } catch (error) {
-    // Tangkap network error (failed to fetch)
     if (error instanceof TypeError && error.message.includes('fetch')) {
       throw new Error(`Tidak dapat terhubung ke server. Pastikan server API berjalan di ${isDev && path.startsWith('/api') ? 'proxy target' : API_BASE_URL}`)
     }
@@ -89,7 +87,6 @@ async function safeErrorMessage(response) {
       return text || `${response.status} ${response.statusText}`
     }
   } catch (error) {
-    // Jika parsing gagal, return status dan statusText
     return `Internal Server Error (${response.status})`
   }
 }

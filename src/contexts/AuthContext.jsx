@@ -5,6 +5,7 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [token, setToken] = useState(() => localStorage.getItem('token') || null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -13,9 +14,15 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function checkAuth() {
+    if (!token) {
+      setUser(null)
+      setLoading(false)
+      return
+    }
     try {
-      const userData = await apiGet('/api/auth/me')
-      setUser(userData)
+      // User data bisa dari JWT (decode) atau dari /api/auth/me kalau ada endpoint semacam itu
+      // Di backend Anda tidak ada endpoint /me, jadi bisa simpan username & role dari token ke state saat login
+      setUser(JSON.parse(localStorage.getItem('user') || '{}') || null)
     } catch (error) {
       setUser(null)
     } finally {
@@ -26,11 +33,17 @@ export function AuthProvider({ children }) {
   async function login(username, password) {
     try {
       const response = await apiPost('/api/auth/login', { username, password })
-      setUser(response.user || response)
-      return { success: true, data: response }
+      if (response.token) {
+        setToken(response.token)
+        localStorage.setItem('token', response.token)
+        // simpan user (username, role) di localStorage
+        localStorage.setItem('user', JSON.stringify({ username: response.username, role: response.role }))
+        setUser({ username: response.username, role: response.role })
+        return { success: true, data: response }
+      } else {
+        return { success: false, error: response.error }
+      }
     } catch (error) {
-      console.error('Login error:', error)
-      // Format pesan error yang lebih user-friendly
       const errorMessage = error.message || 'Terjadi kesalahan saat login. Silakan coba lagi.'
       return { success: false, error: errorMessage }
     }
@@ -39,25 +52,21 @@ export function AuthProvider({ children }) {
   async function register(username, password) {
     try {
       const response = await apiPost('/api/auth/register', { username, password })
-      setUser(response.user || response)
       return { success: true, data: response }
     } catch (error) {
       return { success: false, error: error.message }
     }
   }
 
-  async function logout() {
-    try {
-      await apiPost('/api/auth/logout', {})
-    } catch (error) {
-      console.error('Logout error:', error)
-    } finally {
-      setUser(null)
-    }
+  function logout() {
+    setUser(null)
+    setToken(null)
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )
