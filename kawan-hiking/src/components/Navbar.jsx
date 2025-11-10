@@ -173,7 +173,7 @@ export default function Navbar() {
                     {user ? (
                         <>
                             <Link
-                                to="/dashboard"
+                                to={user.role === 'admin' ? '/admin/dashboard' : '/profile'}
                                 className="flex items-center gap-3 px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800/70 transition-all duration-300"
                             >
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-slate-900 font-bold text-sm">
@@ -269,7 +269,11 @@ export default function Navbar() {
 
                     {user ? (
                         <div className="space-y-3 pt-2">
-                            <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
+                            <Link
+                                to={user.role === 'admin' ? '/admin/dashboard' : '/profile'}
+                                onClick={closeMobileMenu}
+                                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800/70 transition-all duration-300"
+                            >
                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-slate-900 font-bold">
                                     {user.name
                                         ? user.name.charAt(0).toUpperCase()
@@ -289,7 +293,7 @@ export default function Navbar() {
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </Link>
                             <button
                                 className="w-full rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-400 px-5 py-3 font-bold text-slate-900 shadow-[0_6px_16px_rgba(34,211,238,0.35)] hover:shadow-[0_8px_20px_rgba(34,211,238,0.45)] transition-all duration-300"
                                 onClick={handleLogout}

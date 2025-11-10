@@ -22,13 +22,26 @@ export default function ChatWidget() {
     scrollToBottom()
   }, [messages])
 
-  // Fetch messages
-  const fetchMessages = async () => {
+  // Fetch messages (optimized - hanya ambil pesan baru jika sudah ada pesan)
+  const fetchMessages = async (incremental = false, lastMessageId = 0) => {
     if (!token) return
     
     try {
-      const data = await apiGet('/api/chat')
-      setMessages(data || [])
+      let url = '/api/chat?limit=30'
+      if (incremental && lastMessageId > 0) {
+        // Ambil hanya pesan baru setelah ID terakhir
+        url = `/api/chat?since_id=${lastMessageId}&limit=50`
+      }
+      
+      const data = await apiGet(url)
+      if (data && data.length > 0) {
+        if (incremental) {
+          // Tambahkan pesan baru ke array yang ada
+          setMessages(prev => [...prev, ...data])
+        } else {
+          setMessages(data || [])
+        }
+      }
     } catch (error) {
       console.error('Error fetching messages:', error)
     }
@@ -49,24 +62,27 @@ export default function ChatWidget() {
   // Load messages saat chat dibuka
   useEffect(() => {
     if (isOpen && token) {
-      fetchMessages()
-      // Polling setiap 2 detik untuk update pesan baru
+      fetchMessages(false) // Load initial messages
+      // Polling setiap 5 detik untuk update pesan baru (dioptimalkan dari 2 detik)
       const interval = setInterval(() => {
-        fetchMessages()
+        // Ambil ID pesan terakhir untuk incremental fetch
+        const lastId = messages.length > 0 ? Math.max(...messages.map(m => m.id || 0)) : 0
+        fetchMessages(true, lastId) // Incremental fetch
         if (isAdmin) {
           fetchUnreadCount()
         }
-      }, 2000)
+      }, 5000) // Diubah dari 2000ms ke 5000ms untuk mengurangi load
       
       return () => clearInterval(interval)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, token, isAdmin])
 
-  // Polling unread count untuk admin (bahkan saat chat tertutup)
+  // Polling unread count untuk admin (bahkan saat chat tertutup) - dioptimalkan
   useEffect(() => {
     if (token && isAdmin) {
       fetchUnreadCount()
-      const interval = setInterval(fetchUnreadCount, 5000)
+      const interval = setInterval(fetchUnreadCount, 10000) // Diubah dari 5 detik ke 10 detik
       return () => clearInterval(interval)
     }
   }, [token, isAdmin])
@@ -80,13 +96,13 @@ export default function ChatWidget() {
     try {
       await apiPost('/api/chat', { message: newMessage })
       setNewMessage('')
-      // Refresh messages setelah kirim
+      // Refresh messages setelah kirim (incremental)
       setTimeout(() => {
-        fetchMessages()
+        fetchMessages(true) // Incremental fetch untuk efisiensi
         if (isAdmin) {
           fetchUnreadCount()
         }
-      }, 500)
+      }, 300)
     } catch (error) {
       console.error('Error sending message:', error)
       alert('Gagal mengirim pesan: ' + error.message)
