@@ -30,8 +30,8 @@ export default function Navbar() {
 
     // Desktop navigation with dropdown
     const tripLinks = [
-        { href: "/open-trip", label: "Open Trip" },
-        { href: "/private-trip", label: "Private Trip" },
+		{ href: "/open-trip", label: "Open Trip (Gabung)" },
+		{ href: "/private-trip", label: "Private Trip (Privat)" },
     ]
 
     const desktopLinks = [
@@ -48,8 +48,8 @@ export default function Navbar() {
     const mobileLinks = [
         { href: "/", label: "Beranda" },
         { href: "/destinasi", label: "Gunung / Destinasi" },
-        { href: "/open-trip", label: "Open Trip" },
-        { href: "/private-trip", label: "Private Trip" },
+		{ href: "/open-trip", label: "Open Trip (Gabung)" },
+		{ href: "/private-trip", label: "Private Trip (Privat)" },
         { href: "/guide", label: "Pemandu / Guide" },
         { href: "/galeri", label: "Galeri" },
         { href: "/testimoni", label: "Testimoni" },

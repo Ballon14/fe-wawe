@@ -27,6 +27,7 @@ import ManageOpenTrips from "./pages/admin/ManageOpenTrips"
 import OpenTripForm from "./pages/admin/OpenTripForm"
 import ManageTestimonials from "./pages/admin/ManageTestimonials"
 import TestimonialForm from "./pages/admin/TestimonialForm"
+import ManagePrivateTrips from "./pages/admin/ManagePrivateTrips"
 
 function PublicLayout({ children }) {
     return (
@@ -235,6 +236,16 @@ export default function App() {
                         <ProtectedRoute requireAdmin={true}>
                             <AdminLayout>
                                 <ManageOpenTrips />
+                            </AdminLayout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/private-trips"
+                    element={
+                        <ProtectedRoute requireAdmin={true}>
+                            <AdminLayout>
+                                <ManagePrivateTrips />
                             </AdminLayout>
                         </ProtectedRoute>
                     }
