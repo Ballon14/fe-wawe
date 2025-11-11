@@ -32,9 +32,7 @@ export function AuthProvider({ children }) {
 
   async function login(username, password) {
     try {
-      const safeUsername = (username || '').trim()
-      const safePassword = (password || '').trim()
-      const response = await apiPost('/api/auth/login', { username: safeUsername, password: safePassword })
+      const response = await apiPost('/api/auth/login', { username, password })
       if (response.token) {
         setToken(response.token)
         localStorage.setItem('token', response.token)
@@ -51,9 +49,15 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function register(username, password) {
+  async function register(username, password, email, nomor_hp, alamat) {
     try {
-      const response = await apiPost('/api/auth/register', { username, password })
+      const response = await apiPost('/api/auth/register', { 
+        username, 
+        password, 
+        email, 
+        nomor_hp, 
+        alamat 
+      })
       return { success: true, data: response }
     } catch (error) {
       return { success: false, error: error.message }

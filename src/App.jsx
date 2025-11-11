@@ -11,13 +11,15 @@ import Register from "./pages/Register"
 import Destinasi from "./pages/Destinasi"
 import DetailDestinasi from "./pages/DetailDestinasi"
 import OpenTrip from "./pages/OpenTrip"
+import DetailOpenTrip from "./pages/DetailOpenTrip"
 import PrivateTrip from "./pages/PrivateTrip"
-import MyPrivateTrips from "./pages/MyPrivateTrips"
 import Guide from "./pages/Guide"
 import DetailGuide from "./pages/DetailGuide"
 import Galeri from "./pages/Galeri"
 import TentangKami from "./pages/TentangKami"
 import Kontak from "./pages/Kontak"
+import Profile from "./pages/Profile"
+import MyPrivateTrips from "./pages/MyPrivateTrips"
 import Dashboard from "./pages/admin/Dashboard"
 import ManageDestinasi from "./pages/admin/ManageDestinasi"
 import DestinasiForm from "./pages/admin/DestinasiForm"
@@ -26,6 +28,7 @@ import GuideForm from "./pages/admin/GuideForm"
 import ManageOpenTrips from "./pages/admin/ManageOpenTrips"
 import OpenTripForm from "./pages/admin/OpenTripForm"
 import ManagePrivateTrips from "./pages/admin/ManagePrivateTrips"
+import ChatWidget from "./components/ChatWidget"
 
 function PublicLayout({ children }) {
     return (
@@ -33,6 +36,7 @@ function PublicLayout({ children }) {
             <Navbar />
             <main>{children}</main>
             <Footer />
+            <ChatWidget />
         </div>
     )
 }
@@ -91,6 +95,14 @@ export default function App() {
                     }
                 />
                 <Route
+                    path="/open-trip/:id"
+                    element={
+                        <PublicLayout>
+                            <DetailOpenTrip />
+                        </PublicLayout>
+                    }
+                />
+                <Route
                     path="/private-trip"
                     element={
                         <PublicLayout>
@@ -101,7 +113,7 @@ export default function App() {
                 <Route
                     path="/status-private-trip"
                     element={
-                        <ProtectedRoute requireAdmin={false}>
+                        <ProtectedRoute>
                             <PublicLayout>
                                 <MyPrivateTrips />
                             </PublicLayout>
@@ -132,7 +144,7 @@ export default function App() {
                         </PublicLayout>
                     }
                 />
-
+                
                 <Route
                     path="/tentang-kami"
                     element={
@@ -147,6 +159,16 @@ export default function App() {
                         <PublicLayout>
                             <Kontak />
                         </PublicLayout>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <PublicLayout>
+                                <Profile />
+                            </PublicLayout>
+                        </ProtectedRoute>
                     }
                 />
 
@@ -271,7 +293,7 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
-
+                
             </Routes>
         </AuthProvider>
     )

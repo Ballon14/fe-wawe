@@ -6,7 +6,7 @@ export default function MyPrivateTrips() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [items, setItems] = useState([])
-  const [filter, setFilter] = useState('all')
+  const [filter, setFilter] = useState('all') // all | disetujui | ditolak | pending | diproses
 
   useEffect(() => {
     async function fetchData() {
@@ -14,7 +14,7 @@ export default function MyPrivateTrips() {
       setError('')
       try {
         const data = await apiGet('/api/private-trips/my')
-        const list = Array.isArray(data) ? data : (data?.data || [])
+        let list = Array.isArray(data) ? data : (data?.data || [])
         setItems(list)
       } catch (e) {
         setError(e.message || 'Gagal memuat data')
@@ -53,7 +53,10 @@ export default function MyPrivateTrips() {
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold">Status Permintaan Private Trip</h1>
-            <Link to="/private-trip" className="rounded-lg border border-cyan-400/60 px-4 py-2 text-cyan-300 hover:bg-cyan-400/10 transition-colors">
+            <Link
+              to="/private-trip"
+              className="rounded-lg border border-cyan-400/60 px-4 py-2 text-cyan-300 hover:bg-cyan-400/10 transition-colors"
+            >
               Buat Permintaan Baru
             </Link>
           </div>
@@ -73,7 +76,11 @@ export default function MyPrivateTrips() {
             </select>
           </div>
 
-          {error && <div className="mb-4 p-3 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30">{error}</div>}
+          {error && (
+            <div className="mb-4 p-3 rounded-lg bg-red-500/20 text-red-300 border border-red-500/30">
+              {error}
+            </div>
+          )}
 
           {loading ? (
             <div className="text-slate-400">Memuat data…</div>
@@ -98,11 +105,17 @@ export default function MyPrivateTrips() {
                     return (
                       <tr key={r.id || i} className="hover:bg-slate-800/30">
                         <td className="px-4 py-3 text-sm text-slate-200">{r.destinasi}</td>
-                        <td className="px-4 py-3 text-sm text-slate-300">{(r.created_at && new Date(r.created_at).toLocaleDateString('id-ID')) || '-'}</td>
-                        <td className="px-4 py-3 text-sm text-slate-300">{(f.tanggal_keberangkatan && new Date(f.tanggal_keberangkatan).toLocaleDateString('id-ID')) || '-'}</td>
+                        <td className="px-4 py-3 text-sm text-slate-300">
+                          {(r.created_at && new Date(r.created_at).toLocaleDateString('id-ID')) || '-'}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-slate-300">
+                          {(f.tanggal_keberangkatan && new Date(f.tanggal_keberangkatan).toLocaleDateString('id-ID')) || '-'}
+                        </td>
                         <td className="px-4 py-3 text-sm text-slate-300">{f.jumlah_peserta || r.min_peserta || 1}</td>
                         <td className="px-4 py-3 text-sm">
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${badgeClass(status)}`}>{status}</span>
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${badgeClass(status)}`}>
+                            {status}
+                          </span>
                         </td>
                       </tr>
                     )

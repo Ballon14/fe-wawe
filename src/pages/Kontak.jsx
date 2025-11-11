@@ -1,18 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 export default function Kontak() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  })
-
-  function handleSubmit(e) {
-    e.preventDefault()
-    // Handle form submission
-    alert('Terima kasih atas pesan Anda! Kami akan segera menghubungi Anda.')
-    setFormData({ name: '', email: '', message: '' })
-  }
 
   return (
     <div className="min-h-screen py-20">
@@ -22,9 +10,9 @@ export default function Kontak() {
           Kontak / Bantuan
         </h1>
         <p className="text-center text-slate-400 mb-12">
-          Hubungi kami untuk pertanyaan atau bantuan
+          Hubungi kami untuk pertanyaan atau bantuan. Gunakan Live Chat untuk komunikasi langsung.
         </p>
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+        <div className="max-w-4xl mx-auto">
           {/* Contact Info */}
           <div className="space-y-6">
             <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
@@ -36,8 +24,8 @@ export default function Kontak() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">WhatsApp</h3>
-                  <p className="text-slate-400">+62 812-3456-7890</p>
-                  <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" 
+                  <p className="text-slate-400">+62 851-9860-7913</p>
+                  <a href="https://wa.me/6285198607913" target="_blank" rel="noopener noreferrer" 
                      className="text-cyan-400 hover:text-cyan-300 text-sm">
                     Chat Sekarang →
                   </a>
@@ -54,8 +42,8 @@ export default function Kontak() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Email</h3>
-                  <p className="text-slate-400">info@kawanhiking.com</p>
-                  <a href="mailto:info@kawanhiking.com" className="text-cyan-400 hover:text-cyan-300 text-sm">
+                  <p className="text-slate-400">infomuncak@gmail.com</p>
+                  <a href="mailto:infomuncak@gmail.com" className="text-cyan-400 hover:text-cyan-300 text-sm">
                     Kirim Email →
                   </a>
                 </div>
@@ -72,56 +60,17 @@ export default function Kontak() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Alamat</h3>
-                  <p className="text-slate-400">Jakarta, Indonesia</p>
+                  <p className="text-slate-400">RT 04/Rw01 Bulus gebang Purworejo</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Contact Form */}
-          <div className="bg-slate-800/50 rounded-xl p-8 border border-slate-700/50">
-            <h2 className="text-2xl font-semibold mb-6">Kirim Pesan</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm text-slate-300 mb-2">Nama</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors"
-                  placeholder="Nama Anda"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-slate-300 mb-2">Email</label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors"
-                  placeholder="email@example.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-slate-300 mb-2">Pesan</label>
-                <textarea
-                  required
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors resize-none"
-                  rows="5"
-                  placeholder="Tulis pesan Anda..."
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full py-3 px-4 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-400 text-slate-900 font-bold hover:shadow-[0_6px_16px_rgba(34,211,238,0.35)] transition-all duration-300"
-              >
-                Kirim Pesan
-              </button>
-            </form>
+          {/* Info untuk Live Chat */}
+          <div className="mt-8 text-center">
+            <p className="text-slate-400 mb-2">
+              Atau gunakan fitur <span className="text-cyan-400 font-semibold">Live Chat</span> di pojok kanan bawah untuk chat langsung dengan kami
+            </p>
           </div>
         </div>
         </div>

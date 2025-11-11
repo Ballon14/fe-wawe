@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 import Hero from "../components/Hero"
 import Features from "../components/Features"
 import Testimonials from "../components/Testimonials"
@@ -186,9 +187,12 @@ export default function Home() {
                                             </div>
                                         )}
                                         
-                                        <button className="w-full mt-4 py-2.5 px-4 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-400 text-slate-900 font-bold hover:shadow-[0_6px_16px_rgba(34,211,238,0.35)] transition-all duration-300 group-hover:scale-105">
+                                        <Link
+                                            to={`/open-trip/${trip?.id || trip?._id || index}`}
+                                            className="block w-full mt-4 py-2.5 px-4 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-400 text-slate-900 font-bold hover:shadow-[0_6px_16px_rgba(34,211,238,0.35)] transition-all duration-300 group-hover:scale-105 text-center"
+                                        >
                                             Lihat Detail
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
                             ))}

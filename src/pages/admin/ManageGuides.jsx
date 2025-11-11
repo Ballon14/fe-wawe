@@ -34,14 +34,15 @@ export default function ManageGuides() {
   }
 
   async function handleDelete(id, index) {
-    if (!confirm('Apakah Anda yakin ingin menghapus guide ini?')) {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus guide ini?')) {
       return
     }
 
     setDeleteLoading(index)
     try {
       await apiDelete(`/api/guides/${id}`)
-      setGuides(guides.filter((g) => (g.id || g._id) !== id))
+      // Refresh data setelah delete
+      await fetchGuides()
     } catch (e) {
       alert(`Gagal menghapus: ${e.message}`)
     } finally {
@@ -90,9 +91,10 @@ export default function ManageGuides() {
             <thead>
               <tr className="border-b border-slate-700/50">
                 <th className="text-left p-4 text-slate-300 font-semibold">Nama</th>
+                <th className="text-left p-4 text-slate-300 font-semibold">Email</th>
                 <th className="text-left p-4 text-slate-300 font-semibold">Pengalaman</th>
                 <th className="text-left p-4 text-slate-300 font-semibold">Rating</th>
-                <th className="text-left p-4 text-slate-300 font-semibold">Alamat</th>
+                <th className="text-left p-4 text-slate-300 font-semibold">Status</th>
                 <th className="text-right p-4 text-slate-300 font-semibold">Aksi</th>
               </tr>
             </thead>
@@ -107,6 +109,9 @@ export default function ManageGuides() {
                       {guide?.nama || 'Tanpa Nama'}
                     </div>
                   </td>
+                  <td className="p-4 text-slate-300 text-sm">
+                    {guide?.email || '-'}
+                  </td>
                   <td className="p-4 text-slate-300">
                     {guide?.pengalaman || '-'}
                   </td>
@@ -115,12 +120,14 @@ export default function ManageGuides() {
                       ⭐ {guide?.rating || '0.0'}
                     </span>
                   </td>
-                  <td className="p-4 text-slate-300 text-sm">
-                    {guide?.alamat ? (
-                      <span className="line-clamp-1">{guide.alamat}</span>
-                    ) : (
-                      '-'
-                    )}
+                  <td className="p-4">
+                    <span className={`px-2 py-1 rounded-lg text-sm border ${
+                      guide?.status === 'aktif' 
+                        ? 'bg-green-400/10 text-green-400 border-green-400/20' 
+                        : 'bg-red-400/10 text-red-400 border-red-400/20'
+                    }`}>
+                      {guide?.status === 'aktif' ? 'Aktif' : 'Tidak Aktif'}
+                    </span>
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-2">

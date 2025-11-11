@@ -53,7 +53,6 @@ export default function ManagePrivateTrips() {
         setReport({ year: selectedYear, data: [] })
       }
     } catch (e) {
-      // Jangan ganggu tampilan utama jika laporan gagal
       setReport({ year: selectedYear, data: [] })
     } finally {
       setReportLoading(false)
@@ -70,7 +69,6 @@ export default function ManagePrivateTrips() {
   }
 
   function extractRequestFields(row) {
-    // Backend menyimpan detail request di kolom JSON custom_form
     let form = {}
     try {
       if (row?.custom_form) {

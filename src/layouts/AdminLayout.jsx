@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import ChatWidget from '../components/ChatWidget'
 
 export default function AdminLayout({ children }) {
   const { user, logout } = useAuth()
@@ -112,6 +113,7 @@ export default function AdminLayout({ children }) {
         <div className="min-h-screen">
           {children}
         </div>
+        <ChatWidget />
       </main>
     </div>
   )

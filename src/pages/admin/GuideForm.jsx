@@ -12,12 +12,15 @@ export default function GuideForm() {
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
     nama: '',
+    email: '',
     pengalaman: '',
     rating: '',
     alamat: '',
     spesialisasi: '',
     deskripsi: '',
     foto: '',
+    sertifikat: '',
+    status: 'aktif',
   })
 
   useEffect(() => {
@@ -31,18 +34,47 @@ export default function GuideForm() {
       const data = await apiGet(`/api/guides/${id}`)
       const guide = data?.guide || data?.data || data
       
+      // Parse spesialisasi
+      let spesialisasiStr = ''
+      if (guide?.spesialisasi) {
+        if (Array.isArray(guide.spesialisasi)) {
+          spesialisasiStr = guide.spesialisasi.join(', ')
+        } else if (typeof guide.spesialisasi === 'string') {
+          try {
+            const parsed = JSON.parse(guide.spesialisasi)
+            spesialisasiStr = Array.isArray(parsed) ? parsed.join(', ') : guide.spesialisasi
+          } catch {
+            spesialisasiStr = guide.spesialisasi
+          }
+        }
+      }
+
+      // Parse sertifikat
+      let sertifikatStr = ''
+      if (guide?.sertifikat) {
+        if (Array.isArray(guide.sertifikat)) {
+          sertifikatStr = guide.sertifikat.join(', ')
+        } else if (typeof guide.sertifikat === 'string') {
+          try {
+            const parsed = JSON.parse(guide.sertifikat)
+            sertifikatStr = Array.isArray(parsed) ? parsed.join(', ') : guide.sertifikat
+          } catch {
+            sertifikatStr = guide.sertifikat
+          }
+        }
+      }
+      
       setFormData({
         nama: guide?.nama || '',
+        email: guide?.email || '',
         pengalaman: guide?.pengalaman || '',
         rating: guide?.rating || '',
         alamat: guide?.alamat || '',
-        spesialisasi: Array.isArray(guide?.spesialisasi)
-          ? guide.spesialisasi.join(', ')
-          : typeof guide?.spesialisasi === 'string'
-          ? guide.spesialisasi
-          : '',
+        spesialisasi: spesialisasiStr,
         deskripsi: guide?.deskripsi || '',
         foto: guide?.foto || '',
+        sertifikat: sertifikatStr,
+        status: guide?.status || 'aktif',
       })
     } catch (e) {
       setError(`Gagal mengambil data: ${e.message}`)
@@ -62,10 +94,20 @@ export default function GuideForm() {
 
     try {
       const submitData = {
-        ...formData,
+        nama: formData.nama,
+        email: formData.email || null,
+        pengalaman: formData.pengalaman || null,
+        rating: formData.rating ? parseFloat(formData.rating) : null,
+        alamat: formData.alamat || null,
         spesialisasi: formData.spesialisasi
-          ? formData.spesialisasi.split(',').map((s) => s.trim())
+          ? formData.spesialisasi.split(',').map((s) => s.trim()).filter(s => s)
           : [],
+        deskripsi: formData.deskripsi || null,
+        foto: formData.foto || null,
+        sertifikat: formData.sertifikat
+          ? formData.sertifikat.split(',').map((s) => s.trim()).filter(s => s)
+          : [],
+        status: formData.status || 'aktif',
       }
 
       if (isEdit) {
@@ -119,6 +161,20 @@ export default function GuideForm() {
                 value={formData.nama}
                 onChange={handleChange}
                 required
+                className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="guide@example.com"
                 className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
               />
             </div>
@@ -179,9 +235,29 @@ export default function GuideForm() {
                 name="spesialisasi"
                 value={formData.spesialisasi}
                 onChange={handleChange}
-                placeholder="Contoh: Gunung Bromo, Gunung Semeru"
+                placeholder="Contoh: Gunung Bromo, Gunung Semeru, Pendakian Jarak Jauh"
                 className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
               />
+              <p className="mt-1 text-xs text-slate-400">
+                Masukkan spesialisasi guide, pisahkan dengan koma
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Sertifikat (pisahkan dengan koma)
+              </label>
+              <input
+                type="text"
+                name="sertifikat"
+                value={formData.sertifikat}
+                onChange={handleChange}
+                placeholder="Contoh: Sertifikat Pemandu Gunung APGI, Lisensi Pemandu Geowisata"
+                className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
+              />
+              <p className="mt-1 text-xs text-slate-400">
+                Masukkan sertifikat atau lisensi yang dimiliki, pisahkan dengan koma
+              </p>
             </div>
 
             <div>
@@ -207,8 +283,30 @@ export default function GuideForm() {
                 value={formData.deskripsi}
                 onChange={handleChange}
                 rows="5"
+                placeholder="Masukkan deskripsi lengkap tentang guide..."
                 className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
               />
+              <p className="mt-1 text-xs text-slate-400">
+                Deskripsi lengkap tentang guide, pengalaman, keahlian, dll.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Status
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
+              >
+                <option value="aktif">Aktif</option>
+                <option value="tidak aktif">Tidak Aktif</option>
+              </select>
+              <p className="mt-1 text-xs text-slate-400">
+                Status guide (aktif/tidak aktif)
+              </p>
             </div>
           </div>
 

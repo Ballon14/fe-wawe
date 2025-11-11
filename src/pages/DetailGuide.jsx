@@ -34,6 +34,8 @@ export default function DetailGuide() {
                 }
 
                 setGuide(guideData)
+
+                // testimonials moved to Instagram; no in-app fetching
             } catch (e) {
                 console.error("Error fetching guide:", e)
                 setError(`Gagal mengambil data guide: ${e.message}`)
@@ -441,18 +443,18 @@ export default function DetailGuide() {
                     <div className="flex flex-wrap gap-4 justify-center">
                         {(() => {
                           const WA_NUMBER = import.meta.env.VITE_WA_NUMBER || "6285198607913"
-                            const msg = encodeURIComponent(`Halo Kawan Hiking, saya ingin menghubungi guide: ${guide.nama || 'tanpa nama'} (ID: ${guide.id || ''}).`)
-                            const waLink = `https://wa.me/${WA_NUMBER}?text=${msg}`
-                            return (
-                                <a
-                                    href={waLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-400 px-8 py-4 font-bold text-slate-900 shadow-[0_6px_16px_rgba(34,211,238,0.35)] hover:shadow-[0_8px_24px_rgba(34,211,238,0.5)] transition-all duration-300 hover:scale-105"
-                                >
-                                    Hubungi via WhatsApp
-                                </a>
-                            )
+                          const msg = encodeURIComponent(`Halo Kawan Hiking, saya ingin menghubungi guide: ${guide.nama || 'tanpa nama'} (ID: ${guide.id || ''}).`)
+                          const waLink = `https://wa.me/${WA_NUMBER}?text=${msg}`
+                          return (
+                            <a
+                              href={waLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-400 px-8 py-4 font-bold text-slate-900 shadow-[0_6px_16px_rgba(34,211,238,0.35)] hover:shadow-[0_8px_24px_rgba(34,211,238,0.5)] transition-all duration-300 hover:scale-105"
+                            >
+                              Hubungi via WhatsApp
+                            </a>
+                          )
                         })()}
                         <Link
                             to="/private-trip"
@@ -460,6 +462,17 @@ export default function DetailGuide() {
                         >
                             Buat Private Trip
                         </Link>
+                    </div>
+                    {/* Testimoni dialihkan ke Instagram */}
+                    <div className="mt-6 max-w-3xl mx-auto text-center">
+                      <a
+                        href={(import.meta.env.VITE_IG_URL || 'https://www.instagram.com/kawan.hiking/?hl=en')}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg border border-pink-400/50 px-5 py-2.5 text-pink-300 hover:bg-pink-500/10 transition-colors"
+                      >
+                        Lihat Testimoni di Instagram
+                      </a>
                     </div>
                 </div>
             </div>

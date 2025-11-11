@@ -180,11 +180,12 @@ async function safeErrorMessage(response) {
         const contentType = response.headers.get("content-type")
         if (contentType && contentType.includes("application/json")) {
             const data = await response.json()
-            return (
-                data?.message ||
-                data?.error ||
-                `${response.status} ${response.statusText}`
-            )
+            // Prioritaskan pesan error yang lebih detail dari backend
+            const errorMsg = data?.message || data?.error || data?.errorMessage || data?.detail
+            if (errorMsg) {
+                return `${response.status} ${response.statusText}: ${errorMsg}`
+            }
+            return `${response.status} ${response.statusText}`
         } else {
             const text = await response.text()
             return text || `${response.status} ${response.statusText}`

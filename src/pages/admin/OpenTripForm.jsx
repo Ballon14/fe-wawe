@@ -11,12 +11,14 @@ export default function OpenTripForm() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
-    judul: '',
-    destinasi: '',
-    tanggal: '',
-    harga: '',
+    nama_trip: '',
+    tanggal_berangkat: '',
+    durasi: '',
     kuota: '',
-    deskripsi: '',
+    harga_per_orang: '',
+    fasilitas: '',
+    itinerary: '',
+    dokumentasi: '',
   })
 
   useEffect(() => {
@@ -30,13 +32,30 @@ export default function OpenTripForm() {
       const data = await apiGet(`/api/open-trips/${id}`)
       const trip = data?.trip || data?.data || data
       
+      // Parse JSON fields
+      let fasilitasStr = ''
+      if (trip?.fasilitas) {
+        if (typeof trip.fasilitas === 'string') {
+          try {
+            const parsed = JSON.parse(trip.fasilitas)
+            fasilitasStr = typeof parsed === 'string' ? parsed : ''
+          } catch {
+            fasilitasStr = trip.fasilitas
+          }
+        } else {
+          fasilitasStr = trip.fasilitas
+        }
+      }
+      
       setFormData({
-        judul: trip?.judul || trip?.title || trip?.nama || '',
-        destinasi: trip?.destinasi || trip?.destination || '',
-        tanggal: trip?.tanggal || trip?.date || '',
-        harga: trip?.harga || trip?.price || '',
-        kuota: trip?.kuota || trip?.quota || '',
-        deskripsi: trip?.deskripsi || trip?.description || '',
+        nama_trip: trip?.nama_trip || '',
+        tanggal_berangkat: trip?.tanggal_berangkat ? trip.tanggal_berangkat.split('T')[0] : '',
+        durasi: trip?.durasi || '',
+        kuota: trip?.kuota || '',
+        harga_per_orang: trip?.harga_per_orang || '',
+        fasilitas: fasilitasStr,
+        itinerary: trip?.itinerary || '',
+        dokumentasi: trip?.dokumentasi ? (typeof trip.dokumentasi === 'string' ? trip.dokumentasi : JSON.stringify(trip.dokumentasi)) : '',
       })
     } catch (e) {
       setError(`Gagal mengambil data: ${e.message}`)
@@ -55,10 +74,21 @@ export default function OpenTripForm() {
     setError('')
 
     try {
+      const submitData = {
+        nama_trip: formData.nama_trip,
+        tanggal_berangkat: formData.tanggal_berangkat,
+        durasi: formData.durasi ? parseInt(formData.durasi) : null,
+        kuota: formData.kuota ? parseInt(formData.kuota) : null,
+        harga_per_orang: formData.harga_per_orang ? parseInt(formData.harga_per_orang) : null,
+        fasilitas: formData.fasilitas || null,
+        itinerary: formData.itinerary || null,
+        dokumentasi: formData.dokumentasi || null,
+      }
+
       if (isEdit) {
-        await apiPut(`/api/open-trips/${id}`, formData)
+        await apiPut(`/api/open-trips/${id}`, submitData)
       } else {
-        await apiPost('/api/open-trips', formData)
+        await apiPost('/api/open-trips', submitData)
       }
       navigate('/admin/open-trips')
     } catch (e) {
@@ -98,30 +128,15 @@ export default function OpenTripForm() {
           <div className="rounded-xl border border-slate-700/50 bg-slate-800/50 p-6 space-y-6">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Judul Trip *
+                Nama Trip *
               </label>
               <input
                 type="text"
-                name="judul"
-                value={formData.judul}
+                name="nama_trip"
+                value={formData.nama_trip}
                 onChange={handleChange}
                 required
-                placeholder="Contoh: Open Trip Gunung Bromo"
-                className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Destinasi *
-              </label>
-              <input
-                type="text"
-                name="destinasi"
-                value={formData.destinasi}
-                onChange={handleChange}
-                required
-                placeholder="Contoh: Gunung Bromo"
+                placeholder="Contoh: Explore Bromo Midnight 2D1N"
                 className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
               />
             </div>
@@ -129,12 +144,12 @@ export default function OpenTripForm() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Tanggal *
+                  Tanggal Berangkat *
                 </label>
                 <input
                   type="date"
-                  name="tanggal"
-                  value={formData.tanggal}
+                  name="tanggal_berangkat"
+                  value={formData.tanggal_berangkat}
                   onChange={handleChange}
                   required
                   className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
@@ -143,15 +158,50 @@ export default function OpenTripForm() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Kuota
+                  Durasi (hari) *
+                </label>
+                <input
+                  type="number"
+                  name="durasi"
+                  value={formData.durasi}
+                  onChange={handleChange}
+                  required
+                  min="1"
+                  placeholder="Contoh: 2"
+                  className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
+                />
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Kuota *
                 </label>
                 <input
                   type="number"
                   name="kuota"
                   value={formData.kuota}
                   onChange={handleChange}
+                  required
                   min="1"
                   placeholder="Jumlah peserta"
+                  className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Harga per Orang (Rp) *
+                </label>
+                <input
+                  type="number"
+                  name="harga_per_orang"
+                  value={formData.harga_per_orang}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                  placeholder="500000"
                   className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
                 />
               </div>
@@ -159,30 +209,28 @@ export default function OpenTripForm() {
 
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Harga (Rp) *
+                Fasilitas
               </label>
-              <input
-                type="number"
-                name="harga"
-                value={formData.harga}
+              <textarea
+                name="fasilitas"
+                value={formData.fasilitas}
                 onChange={handleChange}
-                required
-                min="0"
-                placeholder="500000"
+                rows="3"
+                placeholder="Masukkan fasilitas yang disediakan..."
                 className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Deskripsi
+                Itinerary
               </label>
               <textarea
-                name="deskripsi"
-                value={formData.deskripsi}
+                name="itinerary"
+                value={formData.itinerary}
                 onChange={handleChange}
                 rows="5"
-                placeholder="Detail informasi trip..."
+                placeholder="Detail itinerary per hari..."
                 className="w-full rounded-lg border border-slate-400/30 bg-slate-800/70 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
               />
             </div>
