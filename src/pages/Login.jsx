@@ -15,13 +15,16 @@ export default function Login() {
         setError("")
         setLoading(true)
 
-        if (!username || !password) {
+        const u = username.trim()
+        const p = password.trim()
+
+        if (!u || !p) {
             setError("Username dan password harus diisi")
             setLoading(false)
             return
         }
 
-        const result = await login(username, password)
+        const result = await login(u, p)
 
         if (result.success) {
             // Cek role dari response atau dari user context
@@ -34,9 +37,9 @@ export default function Login() {
                 navigate("/")
             }
         } else {
-            setError(
-                result.error || "Login gagal. Periksa email dan password Anda."
-            )
+            const msg = result.error || "Login gagal. Periksa username dan password Anda."
+            // Sederhanakan pesan error agar tidak menakut-nakuti pengguna
+            setError(msg.replace(/^\\d+\\s[^:]+:\\s*/i, ""))
         }
 
         setLoading(false)

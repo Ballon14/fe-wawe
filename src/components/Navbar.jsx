@@ -34,28 +34,24 @@ export default function Navbar() {
 		{ href: "/private-trip", label: "Private Trip (Privat)" },
     ]
 
-    const desktopLinks = [
-        { href: "/", label: "Beranda" },
-        { href: "/destinasi", label: "Destinasi" },
-        { href: "/guide", label: "Guide" },
-        { href: "/galeri", label: "Galeri" },
-        { href: "/testimoni", label: "Testimoni" },
-        { href: "/tentang-kami", label: "Tentang" },
-        { href: "/kontak", label: "Kontak" },
-    ]
+	const desktopLinks = [
+		{ href: "/", label: "Beranda" },
+		{ href: "/destinasi", label: "Destinasi" },
+		{ href: "/guide", label: "Guide" },
+		{ href: "/tentang-kami", label: "Tentang" },
+		{ href: "/kontak", label: "Kontak" },
+	]
 
     // Mobile navigation (all links)
-    const mobileLinks = [
-        { href: "/", label: "Beranda" },
-        { href: "/destinasi", label: "Gunung / Destinasi" },
+	const mobileLinks = [
+		{ href: "/", label: "Beranda" },
+		{ href: "/destinasi", label: "Gunung / Destinasi" },
 		{ href: "/open-trip", label: "Open Trip (Gabung)" },
 		{ href: "/private-trip", label: "Private Trip (Privat)" },
-        { href: "/guide", label: "Pemandu / Guide" },
-        { href: "/galeri", label: "Galeri" },
-        { href: "/testimoni", label: "Testimoni" },
-        { href: "/tentang-kami", label: "Tentang Kami" },
-        { href: "/kontak", label: "Kontak / Bantuan" },
-    ]
+		{ href: "/guide", label: "Pemandu / Guide" },
+		{ href: "/tentang-kami", label: "Tentang Kami" },
+		{ href: "/kontak", label: "Kontak / Bantuan" },
+	]
 
     function isActive(href) {
         return location.pathname === href

@@ -12,6 +12,7 @@ export default function PrivateTrip() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [myRequests, setMyRequests] = useState([])
   
   // Form state
   const [formData, setFormData] = useState({
@@ -27,10 +28,17 @@ export default function PrivateTrip() {
       setLoading(true)
       try {
         // Fetch destinations dan guides secara parallel
-        const [destsData, guidesData] = await Promise.all([
+        const promises = [
           apiGet('/api/destinations').catch(() => []),
           apiGet('/api/guides').catch(() => [])
-        ])
+        ]
+        if (user && token) {
+          promises.push(apiGet('/api/private-trips/my').catch(() => []))
+        }
+        const results = await Promise.all(promises)
+        const destsData = results[0]
+        const guidesData = results[1]
+        const myData = results[2]
 
         // Process destinations
         let destList = []
@@ -52,6 +60,14 @@ export default function PrivateTrip() {
           (guide) => !guide.status || guide.status === 'aktif' || guide.status === 'active'
         )
         setGuides(guideList)
+        // My requests
+        let reqList = []
+        if (Array.isArray(myData)) {
+          reqList = myData
+        } else if (myData?.data) {
+          reqList = myData.data
+        }
+        setMyRequests(reqList)
       } catch (e) {
         console.error('Error fetching data:', e)
         setError('Gagal memuat data destinasi dan guide')
@@ -141,6 +157,65 @@ export default function PrivateTrip() {
           {success && (
             <div className="mb-6 p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-center">
               {success}
+            </div>
+          )}
+
+          <div className="mb-6 text-center">
+            <Link
+              to="/status-private-trip"
+              className="inline-flex items-center gap-2 rounded-lg border border-cyan-400/60 px-4 py-2 text-cyan-300 hover:bg-cyan-400/10 transition-colors"
+            >
+              Lihat Semua Status Permintaan
+            </Link>
+          </div>
+
+          {user && myRequests.length > 0 && (
+            <div className="mb-8 rounded-xl border border-slate-700 overflow-hidden">
+              <div className="px-4 py-3 bg-slate-800/60 flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Status Permintaan Anda</h2>
+              </div>
+              <div className="p-4 overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-700">
+                  <thead className="bg-slate-800/40">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">Destinasi</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">Tgl Pesan</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">Tgl Berangkat</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">Peserta</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800">
+                    {myRequests.slice(0, 5).map((r, i) => {
+                      let form = {}
+                      try { form = typeof r.custom_form === 'string' ? JSON.parse(r.custom_form) : (r.custom_form || {}) } catch {}
+                      const status = (form.status || 'pending').toLowerCase()
+                      const badge =
+                        status === 'disetujui' ? 'bg-green-500/20 text-green-300' :
+                        status === 'ditolak' ? 'bg-red-500/20 text-red-300' :
+                        status === 'diproses' ? 'bg-blue-500/20 text-blue-300' :
+                        'bg-yellow-500/20 text-yellow-300'
+                      return (
+                        <tr key={r.id || i} className="hover:bg-slate-800/30">
+                          <td className="px-4 py-3 text-sm text-slate-200">{r.destinasi}</td>
+                          <td className="px-4 py-3 text-sm text-slate-300">
+                            {(r.created_at && new Date(r.created_at).toLocaleDateString('id-ID')) || '-'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-300">
+                            {(form.tanggal_keberangkatan && new Date(form.tanggal_keberangkatan).toLocaleDateString('id-ID')) || '-'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-300">{form.jumlah_peserta || r.min_peserta || 1}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${badge}`}>
+                              {status}
+                            </span>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 

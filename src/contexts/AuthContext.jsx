@@ -32,7 +32,9 @@ export function AuthProvider({ children }) {
 
   async function login(username, password) {
     try {
-      const response = await apiPost('/api/auth/login', { username, password })
+      const safeUsername = (username || '').trim()
+      const safePassword = (password || '').trim()
+      const response = await apiPost('/api/auth/login', { username: safeUsername, password: safePassword })
       if (response.token) {
         setToken(response.token)
         localStorage.setItem('token', response.token)

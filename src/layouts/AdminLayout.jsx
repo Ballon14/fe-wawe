@@ -14,7 +14,6 @@ export default function AdminLayout({ children }) {
     { path: '/admin/guides', label: 'Guide', icon: '👨‍🦯' },
     { path: '/admin/open-trips', label: 'Open Trip', icon: '🎒' },
     { path: '/admin/private-trips', label: 'Private Trip', icon: '🔒' },
-    { path: '/admin/testimonials', label: 'Testimoni', icon: '⭐' },
   ]
 
   useEffect(() => {

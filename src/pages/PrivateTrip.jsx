@@ -35,6 +35,11 @@ export default function PrivateTrip() {
               />
             </div>
           </div>
+          <div className="mb-6 text-center">
+            <a href="/status-private-trip" className="inline-flex items-center gap-2 rounded-lg border border-cyan-400/60 px-4 py-2 text-cyan-300 hover:bg-cyan-400/10 transition-colors">
+              Lihat Semua Status Permintaan
+            </a>
+          </div>
           <button className="w-full py-3 px-4 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-400 text-slate-900 font-bold hover:shadow-[0_6px_16px_rgba(34,211,238,0.35)] transition-all duration-300">
             Buat Permintaan Trip
           </button>

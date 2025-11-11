@@ -12,10 +12,10 @@ import Destinasi from "./pages/Destinasi"
 import DetailDestinasi from "./pages/DetailDestinasi"
 import OpenTrip from "./pages/OpenTrip"
 import PrivateTrip from "./pages/PrivateTrip"
+import MyPrivateTrips from "./pages/MyPrivateTrips"
 import Guide from "./pages/Guide"
 import DetailGuide from "./pages/DetailGuide"
 import Galeri from "./pages/Galeri"
-import Testimoni from "./pages/Testimoni"
 import TentangKami from "./pages/TentangKami"
 import Kontak from "./pages/Kontak"
 import Dashboard from "./pages/admin/Dashboard"
@@ -25,8 +25,6 @@ import ManageGuides from "./pages/admin/ManageGuides"
 import GuideForm from "./pages/admin/GuideForm"
 import ManageOpenTrips from "./pages/admin/ManageOpenTrips"
 import OpenTripForm from "./pages/admin/OpenTripForm"
-import ManageTestimonials from "./pages/admin/ManageTestimonials"
-import TestimonialForm from "./pages/admin/TestimonialForm"
 import ManagePrivateTrips from "./pages/admin/ManagePrivateTrips"
 
 function PublicLayout({ children }) {
@@ -101,6 +99,16 @@ export default function App() {
                     }
                 />
                 <Route
+                    path="/status-private-trip"
+                    element={
+                        <ProtectedRoute requireAdmin={false}>
+                            <PublicLayout>
+                                <MyPrivateTrips />
+                            </PublicLayout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="/guide"
                     element={
                         <PublicLayout>
@@ -124,14 +132,7 @@ export default function App() {
                         </PublicLayout>
                     }
                 />
-                <Route
-                    path="/testimoni"
-                    element={
-                        <PublicLayout>
-                            <Testimoni />
-                        </PublicLayout>
-                    }
-                />
+
                 <Route
                     path="/tentang-kami"
                     element={
@@ -270,36 +271,7 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
-                <Route
-                    path="/admin/testimonials"
-                    element={
-                        <ProtectedRoute requireAdmin={true}>
-                            <AdminLayout>
-                                <ManageTestimonials />
-                            </AdminLayout>
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/admin/testimonials/tambah"
-                    element={
-                        <ProtectedRoute requireAdmin={true}>
-                            <AdminLayout>
-                                <TestimonialForm />
-                            </AdminLayout>
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/admin/testimonials/edit/:id"
-                    element={
-                        <ProtectedRoute requireAdmin={true}>
-                            <AdminLayout>
-                                <TestimonialForm />
-                            </AdminLayout>
-                        </ProtectedRoute>
-                    }
-                />
+
             </Routes>
         </AuthProvider>
     )
