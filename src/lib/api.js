@@ -1,4 +1,8 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "localhost:3000"
+const API_BASE_URL =
+    (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL)?.replace(
+        /\/$/,
+        ""
+    ) || "http://localhost:3000"
 const isDev = import.meta.env.DEV
 
 function getTokenHeader() {
