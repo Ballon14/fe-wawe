@@ -1,6 +1,8 @@
 import React from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
 import { AuthProvider } from "./contexts/AuthContext"
+import { ChatProvider } from "./contexts/ChatContext"
+import { useAuth } from "./contexts/AuthContext"
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -33,15 +35,20 @@ import OpenTripForm from "./pages/admin/OpenTripForm"
 import ManagePrivateTrips from "./pages/admin/ManagePrivateTrips"
 import ManageOpenTripRegistrations from "./pages/admin/ManageOpenTripRegistrations"
 import ChatWidget from "./components/ChatWidget"
+import ChatKomunitas from "./pages/ChatKomunitas"
+import ManageChat from "./pages/admin/ManageChat"
 
 function PublicLayout({ children }) {
+    const { user, token } = useAuth()
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-100">
-            <Navbar />
-            <main>{children}</main>
-            <Footer />
-            <ChatWidget />
-        </div>
+        <ChatProvider>
+            <div className="min-h-screen bg-slate-900 text-slate-100">
+                <Navbar />
+                <main>{children}</main>
+                <Footer />
+                {user && token ? <ChatWidget /> : null}
+            </div>
+        </ChatProvider>
     )
 }
 
@@ -178,7 +185,17 @@ export default function App() {
                         </PublicLayout>
                     }
                 />
-                
+                <Route
+                    path="/chat-komunitas"
+                    element={
+                        <ProtectedRoute>
+                            <PublicLayout>
+                                <ChatKomunitas />
+                            </PublicLayout>
+                        </ProtectedRoute>
+                    }
+                />
+
                 <Route
                     path="/tentang-kami"
                     element={
@@ -337,7 +354,16 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
-                
+                <Route
+                    path="/admin/chat"
+                    element={
+                        <ProtectedRoute requireAdmin={true}>
+                            <AdminLayout>
+                                <ManageChat />
+                            </AdminLayout>
+                        </ProtectedRoute>
+                    }
+                />
             </Routes>
         </AuthProvider>
     )

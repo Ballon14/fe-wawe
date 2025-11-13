@@ -39,6 +39,7 @@ export default function Navbar() {
         { href: "/", label: "Beranda" },
         { href: "/destinasi", label: "Destinasi" },
         { href: "/guide", label: "Guide" },
+        { href: "/chat-komunitas", label: "Komunitas" },
         { href: "/tentang-kami", label: "Tentang" },
         { href: "/kontak", label: "Kontak" },
     ]
@@ -51,6 +52,7 @@ export default function Navbar() {
         { href: "/private-trip", label: "Private Trip" },
         { href: "/my-trip", label: "My Trip" },
         { href: "/guide", label: "Pemandu / Guide" },
+        { href: "/chat-komunitas", label: "Chat Komunitas" },
         { href: "/tentang-kami", label: "Tentang Kami" },
         { href: "/kontak", label: "Kontak / Bantuan" },
     ]
