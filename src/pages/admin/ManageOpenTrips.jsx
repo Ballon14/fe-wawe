@@ -113,18 +113,18 @@ export default function ManageOpenTrips() {
                 >
                   <td className="p-4">
                     <div className="font-semibold text-slate-100">
-                      {trip?.judul || trip?.title || trip?.nama || 'Tanpa Judul'}
+                      {trip?.nama_trip || trip?.judul || trip?.title || trip?.nama || 'Tanpa Judul'}
                     </div>
                   </td>
                   <td className="p-4 text-slate-300">
                     {trip?.destinasi || trip?.destination || '-'}
                   </td>
                   <td className="p-4 text-slate-300">
-                    {formatDate(trip?.tanggal || trip?.date)}
+                    {formatDate(trip?.tanggal_berangkat || trip?.tanggal || trip?.date)}
                   </td>
                   <td className="p-4">
                     <span className="text-green-400 font-semibold">
-                      {trip?.harga ? `Rp ${parseInt(trip.harga).toLocaleString('id-ID')}` : '-'}
+                      {trip?.harga_per_orang != null ? `Rp ${parseInt(trip.harga_per_orang).toLocaleString('id-ID')}` : (trip?.harga != null ? `Rp ${parseInt(trip.harga).toLocaleString('id-ID')}` : '-')}
                     </span>
                   </td>
                   <td className="p-4">

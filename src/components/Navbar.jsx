@@ -32,6 +32,7 @@ export default function Navbar() {
     const tripLinks = [
         { href: "/open-trip", label: "Open Trip" },
         { href: "/private-trip", label: "Private Trip" },
+        { href: "/my-trip", label: "My Trip" },
     ]
 
     const desktopLinks = [
@@ -48,6 +49,7 @@ export default function Navbar() {
         { href: "/destinasi", label: "Gunung / Destinasi" },
         { href: "/open-trip", label: "Open Trip" },
         { href: "/private-trip", label: "Private Trip" },
+        { href: "/my-trip", label: "My Trip" },
         { href: "/guide", label: "Pemandu / Guide" },
         { href: "/tentang-kami", label: "Tentang Kami" },
         { href: "/kontak", label: "Kontak / Bantuan" },
@@ -169,7 +171,11 @@ export default function Navbar() {
                     {user ? (
                         <>
                             <Link
-                                to={user.role === 'admin' ? '/admin/dashboard' : '/profile'}
+                                to={
+                                    user.role === "admin"
+                                        ? "/admin/dashboard"
+                                        : "/profile"
+                                }
                                 className="flex items-center gap-3 px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800/70 transition-all duration-300"
                             >
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-slate-900 font-bold text-sm">
@@ -266,7 +272,11 @@ export default function Navbar() {
                     {user ? (
                         <div className="space-y-3 pt-2">
                             <Link
-                                to={user.role === 'admin' ? '/admin/dashboard' : '/profile'}
+                                to={
+                                    user.role === "admin"
+                                        ? "/admin/dashboard"
+                                        : "/profile"
+                                }
                                 onClick={closeMobileMenu}
                                 className="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800/70 transition-all duration-300"
                             >

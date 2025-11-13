@@ -13,6 +13,8 @@ import DetailDestinasi from "./pages/DetailDestinasi"
 import OpenTrip from "./pages/OpenTrip"
 import DetailOpenTrip from "./pages/DetailOpenTrip"
 import PrivateTrip from "./pages/PrivateTrip"
+import OpenTripRegister from "./pages/OpenTripRegister"
+import OpenTripPayment from "./pages/OpenTripPayment"
 import Guide from "./pages/Guide"
 import DetailGuide from "./pages/DetailGuide"
 import Galeri from "./pages/Galeri"
@@ -20,6 +22,7 @@ import TentangKami from "./pages/TentangKami"
 import Kontak from "./pages/Kontak"
 import Profile from "./pages/Profile"
 import MyPrivateTrips from "./pages/MyPrivateTrips"
+import MyTrip from "./pages/MyTrip"
 import Dashboard from "./pages/admin/Dashboard"
 import ManageDestinasi from "./pages/admin/ManageDestinasi"
 import DestinasiForm from "./pages/admin/DestinasiForm"
@@ -28,6 +31,7 @@ import GuideForm from "./pages/admin/GuideForm"
 import ManageOpenTrips from "./pages/admin/ManageOpenTrips"
 import OpenTripForm from "./pages/admin/OpenTripForm"
 import ManagePrivateTrips from "./pages/admin/ManagePrivateTrips"
+import ManageOpenTripRegistrations from "./pages/admin/ManageOpenTripRegistrations"
 import ChatWidget from "./components/ChatWidget"
 
 function PublicLayout({ children }) {
@@ -103,6 +107,26 @@ export default function App() {
                     }
                 />
                 <Route
+                    path="/open-trip/:id/daftar"
+                    element={
+                        <ProtectedRoute>
+                            <PublicLayout>
+                                <OpenTripRegister />
+                            </PublicLayout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/open-trip/:id/pembayaran"
+                    element={
+                        <ProtectedRoute>
+                            <PublicLayout>
+                                <OpenTripPayment />
+                            </PublicLayout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="/private-trip"
                     element={
                         <PublicLayout>
@@ -116,6 +140,16 @@ export default function App() {
                         <ProtectedRoute>
                             <PublicLayout>
                                 <MyPrivateTrips />
+                            </PublicLayout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/my-trip"
+                    element={
+                        <ProtectedRoute>
+                            <PublicLayout>
+                                <MyTrip />
                             </PublicLayout>
                         </ProtectedRoute>
                     }
@@ -259,6 +293,16 @@ export default function App() {
                         <ProtectedRoute requireAdmin={true}>
                             <AdminLayout>
                                 <ManageOpenTrips />
+                            </AdminLayout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/open-trips/registrations"
+                    element={
+                        <ProtectedRoute requireAdmin={true}>
+                            <AdminLayout>
+                                <ManageOpenTripRegistrations />
                             </AdminLayout>
                         </ProtectedRoute>
                     }

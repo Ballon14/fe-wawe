@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { apiGet } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function DetailOpenTrip() {
   const { id } = useParams()
@@ -8,6 +9,7 @@ export default function DetailOpenTrip() {
   const [trip, setTrip] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const { user } = useAuth()
 
   useEffect(() => {
     async function fetchTrip() {
@@ -177,7 +179,16 @@ export default function DetailOpenTrip() {
 
             {/* Action Button */}
             <div className="pt-4 border-t border-slate-700/50">
-              <button className="w-full py-3 px-6 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-400 text-slate-900 font-bold hover:shadow-[0_6px_16px_rgba(34,211,238,0.35)] transition-all duration-300">
+              <button
+                onClick={() => {
+                  if (!user) {
+                    navigate('/login')
+                    return
+                  }
+                  navigate(`/open-trip/${trip?.id || trip?._id || id}/daftar`)
+                }}
+                className="w-full py-3 px-6 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-400 text-slate-900 font-bold hover:shadow-[0_6px_16px_rgba(34,211,238,0.35)] transition-all duration-300"
+              >
                 Daftar Trip
               </button>
             </div>

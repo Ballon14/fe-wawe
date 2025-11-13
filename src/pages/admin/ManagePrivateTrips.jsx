@@ -70,12 +70,27 @@ export default function ManagePrivateTrips() {
 
   function extractRequestFields(row) {
     let form = {}
+    let parseError = false
     try {
       if (row?.custom_form) {
-        form = typeof row.custom_form === 'string' ? JSON.parse(row.custom_form) : row.custom_form
+        if (typeof row.custom_form === 'string') {
+          try {
+            form = JSON.parse(row.custom_form)
+          } catch(e) {
+            // Jika error JSON parse, fallback to empty object dan catat error
+            parseError = true
+            form = {}
+          }
+        } else {
+          form = row.custom_form
+        }
       }
-    } catch {}
+    } catch {
+      form = {}
+      parseError = true
+    }
 
+    // Return hasil beserta flag error
     return {
       pemesan: form.username || row?.username || '-',
       destinasi: row?.destinasi || row?.nama_destinasi || '-',
@@ -83,6 +98,7 @@ export default function ManagePrivateTrips() {
       tanggal: form.tanggal_keberangkatan || row?.tanggal_keberangkatan || null,
       peserta: form.jumlah_peserta || row?.jumlah_peserta || row?.min_peserta || 1,
       status: form.status || row?.status || 'pending',
+      parseError,
     }
   }
 
@@ -173,7 +189,7 @@ export default function ManagePrivateTrips() {
               {trips.map((t, i) => {
                 const f = extractRequestFields(t)
                 return (
-                <tr key={t?.id || t?._id || i} className="hover:bg-slate-800/40">
+                <tr key={t?.id || t?._id || i} className={`hover:bg-slate-800/40${f.parseError ? ' bg-red-950/20' : ''}`}>
                   <td className="px-4 py-3 text-sm text-slate-200">
                     {f.pemesan}
                   </td>
@@ -244,6 +260,9 @@ export default function ManagePrivateTrips() {
                         Hapus
                       </button>
                     </div>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-red-400" colSpan={9} style={{ display: f.parseError ? 'table-cell' : 'none' }}>
+                    ⚠️ Data error: custom_form korup atau tidak valid JSON
                   </td>
                 </tr>
               )})}

@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
 
   async function login(username, password) {
     try {
-      const response = await apiPost('/api/auth/login', { username, password })
+      const response = await apiPost('/api/auth/login', { username: String(username || '').trim(), password })
       if (response.token) {
         setToken(response.token)
         localStorage.setItem('token', response.token)
@@ -44,8 +44,11 @@ export function AuthProvider({ children }) {
         return { success: false, error: response.error }
       }
     } catch (error) {
-      const errorMessage = error.message || 'Terjadi kesalahan saat login. Silakan coba lagi.'
-      return { success: false, error: errorMessage }
+      const msg = (error.message || '').toLowerCase()
+      const friendly = msg.includes('401') || msg.includes('invalid')
+        ? 'Username atau password salah'
+        : 'Terjadi kesalahan saat login. Silakan coba lagi.'
+      return { success: false, error: friendly }
     }
   }
 

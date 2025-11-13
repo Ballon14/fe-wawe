@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { apiGet } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 // Fungsi untuk format tanggal
 function formatDate(dateString) {
@@ -19,6 +20,8 @@ export default function OpenTrip() {
   const [trips, setTrips] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function fetchTrips() {
@@ -141,7 +144,17 @@ export default function OpenTrip() {
                         >
                           Detail
                         </Link>
-                        <button className="px-4 py-2 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-400 text-slate-900 font-bold hover:shadow-[0_6px_16px_rgba(34,211,238,0.35)] transition-all duration-300">
+                        <button
+                          onClick={() => {
+                            const idValue = trip?.id || trip?._id || index
+                            if (!user) {
+                              navigate('/login')
+                              return
+                            }
+                            navigate(`/open-trip/${idValue}/daftar`)
+                          }}
+                          className="px-4 py-2 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-400 text-slate-900 font-bold hover:shadow-[0_6px_16px_rgba(34,211,238,0.35)] transition-all duration-300"
+                        >
                           Daftar
                         </button>
                       </div>

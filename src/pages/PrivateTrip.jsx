@@ -12,7 +12,8 @@ export default function PrivateTrip() {
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState("")
-    const [success, setSuccess] = useState("")
+    const [showSuccessModal, setShowSuccessModal] = useState(false)
+    const [bookingData, setBookingData] = useState(null)
     const [myRequests, setMyRequests] = useState([])
 
     // Form state
@@ -84,10 +85,27 @@ export default function PrivateTrip() {
         fetchData()
     }, [])
 
+    // Handle ESC key to close modal
+    useEffect(() => {
+        function handleEscape(e) {
+            if (e.key === "Escape" && showSuccessModal) {
+                setShowSuccessModal(false)
+            }
+        }
+        if (showSuccessModal) {
+            document.addEventListener("keydown", handleEscape)
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = "hidden"
+        }
+        return () => {
+            document.removeEventListener("keydown", handleEscape)
+            document.body.style.overflow = "unset"
+        }
+    }, [showSuccessModal])
+
     async function handleSubmit(e) {
         e.preventDefault()
         setError("")
-        setSuccess("")
 
         // Validasi login
         if (!user || !token) {
@@ -122,9 +140,35 @@ export default function PrivateTrip() {
                 username: user.username,
             })
 
-            setSuccess(
-                "Permintaan trip berhasil dikirim! Admin akan menghubungi Anda segera."
+            // Get destination name for modal
+            const selectedDestination = destinations.find(
+                (d) => (d?.id || d?._id) == formData.destinasi_id
             )
+            const destinationName =
+                selectedDestination?.nama_destinasi ||
+                selectedDestination?.nama_gunung ||
+                selectedDestination?.nama ||
+                "Destinasi"
+
+            // Get guide name if selected
+            const selectedGuide = formData.guide_id
+                ? guides.find((g) => (g?.id || g?._id) == formData.guide_id)
+                : null
+            const guideName = selectedGuide?.nama || selectedGuide?.name || null
+
+            // Set booking data for modal
+            setBookingData({
+                destination: destinationName,
+                guide: guideName,
+                tanggal: formData.tanggal_keberangkatan,
+                jumlahPeserta: formData.jumlah_peserta,
+                bookingId: response.id || response.data?.id,
+            })
+
+            // Show success modal
+            setShowSuccessModal(true)
+
+            // Reset form
             setFormData({
                 destinasi_id: "",
                 guide_id: "",
@@ -132,6 +176,22 @@ export default function PrivateTrip() {
                 jumlah_peserta: "",
                 catatan: "",
             })
+
+            // Refresh my requests list
+            if (user && token) {
+                try {
+                    const myData = await apiGet("/api/private-trips/my")
+                    let reqList = []
+                    if (Array.isArray(myData)) {
+                        reqList = myData
+                    } else if (myData?.data) {
+                        reqList = myData.data
+                    }
+                    setMyRequests(reqList)
+                } catch (e) {
+                    console.error("Error refreshing requests:", e)
+                }
+            }
         } catch (e) {
             console.error("Error submitting request:", e)
             setError(
@@ -172,12 +232,6 @@ export default function PrivateTrip() {
                         </div>
                     )}
 
-                    {success && (
-                        <div className="mb-6 p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-center">
-                            {success}
-                        </div>
-                    )}
-
                     <div className="mb-6 text-center">
                         <Link
                             to="/status-private-trip"
@@ -188,99 +242,298 @@ export default function PrivateTrip() {
                     </div>
 
                     {user && myRequests.length > 0 && (
-                        <div className="mb-8 rounded-xl border border-slate-700 overflow-hidden">
-                            <div className="px-4 py-3 bg-slate-800/60 flex items-center justify-between">
-                                <h2 className="text-lg font-semibold">
+                        <div className="mb-8">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-2xl font-semibold text-slate-100">
                                     Status Permintaan Anda
                                 </h2>
+                                <span className="text-sm text-slate-400">
+                                    Menampilkan {Math.min(myRequests.length, 5)}{" "}
+                                    dari {myRequests.length} permintaan
+                                </span>
                             </div>
-                            <div className="p-4 overflow-x-auto">
-                                <table className="min-w-full divide-y divide-slate-700">
-                                    <thead className="bg-slate-800/40">
-                                        <tr>
-                                            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
-                                                Destinasi
-                                            </th>
-                                            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
-                                                Tgl Pesan
-                                            </th>
-                                            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
-                                                Tgl Berangkat
-                                            </th>
-                                            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
-                                                Peserta
-                                            </th>
-                                            <th className="px-4 py-3 text-left text-sm font-semibold text-slate-300">
-                                                Status
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-800">
-                                        {myRequests.slice(0, 5).map((r, i) => {
-                                            let form = {}
-                                            try {
-                                                form =
-                                                    typeof r.custom_form ===
-                                                    "string"
-                                                        ? JSON.parse(
-                                                              r.custom_form
-                                                          )
-                                                        : r.custom_form || {}
-                                            } catch {}
-                                            const status = (
-                                                form.status || "pending"
-                                            ).toLowerCase()
-                                            const badge =
-                                                status === "disetujui"
-                                                    ? "bg-green-500/20 text-green-300"
-                                                    : status === "ditolak"
-                                                    ? "bg-red-500/20 text-red-300"
-                                                    : status === "diproses"
-                                                    ? "bg-blue-500/20 text-blue-300"
-                                                    : "bg-yellow-500/20 text-yellow-300"
-                                            return (
-                                                <tr
-                                                    key={r.id || i}
-                                                    className="hover:bg-slate-800/30"
-                                                >
-                                                    <td className="px-4 py-3 text-sm text-slate-200">
-                                                        {r.destinasi}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm text-slate-300">
-                                                        {(r.created_at &&
-                                                            new Date(
-                                                                r.created_at
-                                                            ).toLocaleDateString(
-                                                                "id-ID"
-                                                            )) ||
-                                                            "-"}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm text-slate-300">
-                                                        {(form.tanggal_keberangkatan &&
-                                                            new Date(
-                                                                form.tanggal_keberangkatan
-                                                            ).toLocaleDateString(
-                                                                "id-ID"
-                                                            )) ||
-                                                            "-"}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm text-slate-300">
-                                                        {form.jumlah_peserta ||
-                                                            r.min_peserta ||
-                                                            1}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm">
-                                                        <span
-                                                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${badge}`}
-                                                        >
+                            <div className="grid md:grid-cols-2 gap-4">
+                                {myRequests.slice(0, 5).map((r, i) => {
+                                    let form = {}
+                                    try {
+                                        form =
+                                            typeof r.custom_form === "string"
+                                                ? JSON.parse(r.custom_form)
+                                                : r.custom_form || {}
+                                    } catch {}
+                                    const status = (
+                                        form.status || "pending"
+                                    ).toLowerCase()
+                                    const badgeConfig =
+                                        status === "disetujui"
+                                            ? {
+                                                  bg: "bg-green-500/20",
+                                                  text: "text-green-300",
+                                                  border: "border-green-500/30",
+                                                  icon: (
+                                                      <svg
+                                                          className="w-5 h-5"
+                                                          fill="none"
+                                                          stroke="currentColor"
+                                                          viewBox="0 0 24 24"
+                                                      >
+                                                          <path
+                                                              strokeLinecap="round"
+                                                              strokeLinejoin="round"
+                                                              strokeWidth={2}
+                                                              d="M5 13l4 4L19 7"
+                                                          />
+                                                      </svg>
+                                                  ),
+                                              }
+                                            : status === "ditolak"
+                                            ? {
+                                                  bg: "bg-red-500/20",
+                                                  text: "text-red-300",
+                                                  border: "border-red-500/30",
+                                                  icon: (
+                                                      <svg
+                                                          className="w-5 h-5"
+                                                          fill="none"
+                                                          stroke="currentColor"
+                                                          viewBox="0 0 24 24"
+                                                      >
+                                                          <path
+                                                              strokeLinecap="round"
+                                                              strokeLinejoin="round"
+                                                              strokeWidth={2}
+                                                              d="M6 18L18 6M6 6l12 12"
+                                                          />
+                                                      </svg>
+                                                  ),
+                                              }
+                                            : status === "diproses"
+                                            ? {
+                                                  bg: "bg-blue-500/20",
+                                                  text: "text-blue-300",
+                                                  border: "border-blue-500/30",
+                                                  icon: (
+                                                      <svg
+                                                          className="w-5 h-5"
+                                                          fill="none"
+                                                          stroke="currentColor"
+                                                          viewBox="0 0 24 24"
+                                                      >
+                                                          <path
+                                                              strokeLinecap="round"
+                                                              strokeLinejoin="round"
+                                                              strokeWidth={2}
+                                                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                                          />
+                                                      </svg>
+                                                  ),
+                                              }
+                                            : {
+                                                  bg: "bg-yellow-500/20",
+                                                  text: "text-yellow-300",
+                                                  border: "border-yellow-500/30",
+                                                  icon: (
+                                                      <svg
+                                                          className="w-5 h-5"
+                                                          fill="none"
+                                                          stroke="currentColor"
+                                                          viewBox="0 0 24 24"
+                                                      >
+                                                          <path
+                                                              strokeLinecap="round"
+                                                              strokeLinejoin="round"
+                                                              strokeWidth={2}
+                                                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                          />
+                                                      </svg>
+                                                  ),
+                                              }
+
+                                    const tanggalPesan = r.created_at
+                                        ? new Date(
+                                              r.created_at
+                                          ).toLocaleDateString("id-ID", {
+                                              day: "numeric",
+                                              month: "short",
+                                              year: "numeric",
+                                          })
+                                        : "-"
+
+                                    const tanggalBerangkat =
+                                        form.tanggal_keberangkatan
+                                            ? new Date(
+                                                  form.tanggal_keberangkatan
+                                              ).toLocaleDateString("id-ID", {
+                                                  day: "numeric",
+                                                  month: "short",
+                                                  year: "numeric",
+                                              })
+                                            : "-"
+
+                                    const jumlahPeserta =
+                                        form.jumlah_peserta ||
+                                        r.min_peserta ||
+                                        1
+
+                                    return (
+                                        <div
+                                            key={r.id || i}
+                                            className="group relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-b from-slate-800/80 to-slate-900/60 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-[0_8px_24px_rgba(34,211,238,0.2)] hover:-translate-y-1"
+                                        >
+                                            <div className="p-6">
+                                                {/* Header dengan Status Badge */}
+                                                <div className="flex items-start justify-between mb-4">
+                                                    <div className="flex-1">
+                                                        <h3 className="text-lg font-semibold text-slate-100 mb-2 line-clamp-2">
+                                                            {r.destinasi}
+                                                        </h3>
+                                                    </div>
+                                                    <span
+                                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${badgeConfig.bg} ${badgeConfig.text} ${badgeConfig.border} border`}
+                                                    >
+                                                        {badgeConfig.icon}
+                                                        <span className="capitalize">
                                                             {status}
                                                         </span>
-                                                    </td>
-                                                </tr>
-                                            )
-                                        })}
-                                    </tbody>
-                                </table>
+                                                    </span>
+                                                </div>
+
+                                                {/* Detail Information */}
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center gap-3 text-slate-300 text-sm">
+                                                        <svg
+                                                            className="w-4 h-4 text-cyan-400 flex-shrink-0"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                            />
+                                                        </svg>
+                                                        <div className="flex-1">
+                                                            <span className="text-slate-400">
+                                                                Tgl Pesan:
+                                                            </span>{" "}
+                                                            <span className="font-medium">
+                                                                {tanggalPesan}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-3 text-slate-300 text-sm">
+                                                        <svg
+                                                            className="w-4 h-4 text-cyan-400 flex-shrink-0"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                            />
+                                                        </svg>
+                                                        <div className="flex-1">
+                                                            <span className="text-slate-400">
+                                                                Tgl Berangkat:
+                                                            </span>{" "}
+                                                            <span className="font-medium">
+                                                                {
+                                                                    tanggalBerangkat
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-3 text-slate-300 text-sm">
+                                                        <svg
+                                                            className="w-4 h-4 text-cyan-400 flex-shrink-0"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                                            />
+                                                        </svg>
+                                                        <div className="flex-1">
+                                                            <span className="text-slate-400">
+                                                                Peserta:
+                                                            </span>{" "}
+                                                            <span className="font-medium">
+                                                                {jumlahPeserta}{" "}
+                                                                orang
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {form.guide_name && (
+                                                        <div className="flex items-center gap-3 text-slate-300 text-sm">
+                                                            <svg
+                                                                className="w-4 h-4 text-cyan-400 flex-shrink-0"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={
+                                                                        2
+                                                                    }
+                                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                                />
+                                                            </svg>
+                                                            <div className="flex-1">
+                                                                <span className="text-slate-400">
+                                                                    Guide:
+                                                                </span>{" "}
+                                                                <span className="font-medium">
+                                                                    {
+                                                                        form.guide_name
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Footer dengan Link */}
+                                                <div className="mt-5 pt-4 border-t border-slate-700/50">
+                                                    <Link
+                                                        to="/status-private-trip"
+                                                        className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors group/link"
+                                                    >
+                                                        <span>
+                                                            Lihat Detail
+                                                        </span>
+                                                        <svg
+                                                            className="w-4 h-4 transform group-hover/link:translate-x-1 transition-transform"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M9 5l7 7-7 7"
+                                                            />
+                                                        </svg>
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
                     )}
@@ -462,6 +715,117 @@ export default function PrivateTrip() {
                     </div>
                 </div>
             </div>
+
+            {/* Success Modal */}
+            {showSuccessModal && bookingData && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+                    onClick={() => setShowSuccessModal(false)}
+                >
+                    <div
+                        className="bg-slate-800 rounded-2xl border border-slate-700 max-w-md w-full p-8 shadow-2xl animate-scaleIn transform transition-all"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Success Icon */}
+                        <div className="flex justify-center mb-6">
+                            <div className="relative">
+                                <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center">
+                                    <svg
+                                        className="w-12 h-12 text-green-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={3}
+                                            d="M5 13l4 4L19 7"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400 rounded-full animate-pulse"></div>
+                            </div>
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="text-2xl font-bold text-white text-center mb-3">
+                            Booking Berhasil!
+                        </h3>
+
+                        {/* Message */}
+                        <p className="text-slate-300 text-center mb-6">
+                            Permintaan private trip Anda berhasil dikirim. Admin
+                            akan menghubungi Anda segera untuk konfirmasi dan
+                            detail pembayaran.
+                        </p>
+
+                        {/* Booking Details */}
+                        <div className="bg-slate-900/50 rounded-lg p-4 mb-6 space-y-3 border border-slate-700/50">
+                            <div className="flex justify-between items-center">
+                                <span className="text-slate-400 text-sm">
+                                    Destinasi:
+                                </span>
+                                <span className="text-slate-200 font-semibold">
+                                    {bookingData.destination}
+                                </span>
+                            </div>
+                            {bookingData.guide && (
+                                <div className="flex justify-between items-center">
+                                    <span className="text-slate-400 text-sm">
+                                        Guide:
+                                    </span>
+                                    <span className="text-slate-200 font-semibold">
+                                        {bookingData.guide}
+                                    </span>
+                                </div>
+                            )}
+                            <div className="flex justify-between items-center">
+                                <span className="text-slate-400 text-sm">
+                                    Tanggal:
+                                </span>
+                                <span className="text-slate-200 font-semibold">
+                                    {new Date(
+                                        bookingData.tanggal
+                                    ).toLocaleDateString("id-ID", {
+                                        weekday: "long",
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-slate-400 text-sm">
+                                    Jumlah Peserta:
+                                </span>
+                                <span className="text-slate-200 font-semibold">
+                                    {bookingData.jumlahPeserta} orang
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowSuccessModal(false)
+                                    navigate("/status-private-trip")
+                                }}
+                                className="w-full py-3 px-4 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-400 text-slate-900 font-bold hover:shadow-[0_6px_16px_rgba(34,211,238,0.35)] transition-all duration-300"
+                            >
+                                Lihat Status Booking
+                            </button>
+                            <button
+                                onClick={() => setShowSuccessModal(false)}
+                                className="w-full py-2 px-4 rounded-lg border border-slate-700 text-slate-300 hover:text-white hover:border-slate-600 transition-colors"
+                            >
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
