@@ -2,7 +2,7 @@ const API_BASE_URL =
     (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL)?.replace(
         /\/$/,
         ""
-    ) || "http://localhost:3000"
+    ) || "http://192.168.18.32:3000"
 const isDev = import.meta.env.DEV
 
 function handleUnauthorized() {

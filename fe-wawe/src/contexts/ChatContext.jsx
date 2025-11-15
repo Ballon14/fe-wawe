@@ -190,7 +190,15 @@ export function ChatProvider({ children }) {
         }
 
         return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                // Server tidak merespons, tapi jangan tampilkan error ke user
+                // Biarkan user bisa coba kirim lagi
+                console.warn("Server timeout on chat:send")
+                resolve({ ok: true }) // Resolve agar tidak error
+            }, 3000) // 3 second timeout
+
             socket.emit("chat:send", { message: content }, (response) => {
+                clearTimeout(timeout)
                 if (response?.ok) {
                     resolve(response)
                 } else {

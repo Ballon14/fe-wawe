@@ -70,8 +70,8 @@ export default function Navbar() {
                     className="flex items-center gap-2 no-underline text-inherit group transition-transform duration-300 hover:scale-105"
                     onClick={closeMobileMenu}
                 >
-                    <span className="w-7 h-7 rounded-lg shadow-[0_0_0_4px_rgba(34,211,238,0.08)] bg-gradient-to-br from-cyan-400 to-cyan-700 inline-block group-hover:shadow-[0_0_0_4px_rgba(34,211,238,0.15)] transition-all duration-300" />
-                    <span className="font-bold tracking-wide text-lg">
+                    <span className="w-7 h-7 rounded-lg shadow-[0_0_0_4px_rgba(16,185,129,0.08)] bg-gradient-to-br from-primary-400 to-primary-700 inline-block group-hover:shadow-[0_0_0_4px_rgba(16,185,129,0.15)] transition-all duration-300" />
+                    <span className="font-display font-bold tracking-wide text-lg">
                         Kawan Hiking
                     </span>
                 </Link>
@@ -84,13 +84,13 @@ export default function Navbar() {
                             to={link.href}
                             className={`relative px-4 py-2 rounded-lg transition-all duration-300 group ${
                                 isActive(link.href)
-                                    ? "text-cyan-400 bg-slate-800/50"
-                                    : "text-slate-400 hover:text-cyan-400 hover:bg-slate-800/30"
+                                    ? "text-primary-400 bg-slate-800/50"
+                                    : "text-slate-400 hover:text-primary-400 hover:bg-slate-800/30"
                             }`}
                         >
                             {link.label}
                             <span
-                                className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 transition-all duration-300 ${
+                                className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-gradient-to-r from-primary-400 to-secondary-400 transition-all duration-300 ${
                                     isActive(link.href)
                                         ? "w-3/4"
                                         : "w-0 group-hover:w-3/4"
@@ -102,7 +102,7 @@ export default function Navbar() {
                     {/* Trip Dropdown */}
                     <div className="relative">
                         <button
-                            className="relative px-4 py-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800/30 transition-all duration-300 group flex items-center gap-1"
+                            className="relative px-4 py-2 rounded-lg text-slate-400 hover:text-primary-400 hover:bg-slate-800/30 transition-all duration-300 group flex items-center gap-1"
                             onClick={() => toggleDropdown("trip")}
                         >
                             Trip
@@ -123,7 +123,7 @@ export default function Navbar() {
                                     d="M19 9l-7 7-7-7"
                                 />
                             </svg>
-                            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 w-0 group-hover:w-3/4 transition-all duration-300" />
+                            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-gradient-to-r from-primary-400 to-secondary-400 w-0 group-hover:w-3/4 transition-all duration-300" />
                         </button>
 
                         {activeDropdown === "trip" && (
@@ -134,8 +134,8 @@ export default function Navbar() {
                                         to={link.href}
                                         className={`block px-4 py-3 text-sm transition-colors duration-300 ${
                                             isActive(link.href)
-                                                ? "text-cyan-400 bg-slate-700/50"
-                                                : "text-slate-300 hover:text-cyan-400 hover:bg-slate-700/30"
+                                                ? "text-primary-400 bg-slate-700/50"
+                                                : "text-slate-300 hover:text-primary-400 hover:bg-slate-700/30"
                                         }`}
                                         onClick={() => setActiveDropdown(null)}
                                     >
@@ -152,13 +152,13 @@ export default function Navbar() {
                             to={link.href}
                             className={`relative px-4 py-2 rounded-lg transition-all duration-300 group ${
                                 isActive(link.href)
-                                    ? "text-cyan-400 bg-slate-800/50"
-                                    : "text-slate-400 hover:text-cyan-400 hover:bg-slate-800/30"
+                                    ? "text-primary-400 bg-slate-800/50"
+                                    : "text-slate-400 hover:text-primary-400 hover:bg-slate-800/30"
                             }`}
                         >
                             {link.label}
                             <span
-                                className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 transition-all duration-300 ${
+                                className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-gradient-to-r from-primary-400 to-secondary-400 transition-all duration-300 ${
                                     isActive(link.href)
                                         ? "w-3/4"
                                         : "w-0 group-hover:w-3/4"
@@ -202,7 +202,7 @@ export default function Navbar() {
                     ) : (
                         <>
                             <Link to="/login">
-                                <button className="rounded-xl border border-cyan-400/70 bg-transparent px-5 py-2.5 font-bold text-slate-100 hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300">
+                                <button className="rounded-xl border border-primary-400/70 bg-transparent px-5 py-2.5 font-bold text-slate-100 hover:bg-primary-400/10 hover:border-primary-400 transition-all duration-300">
                                     Masuk
                                 </button>
                             </Link>
@@ -220,7 +220,7 @@ export default function Navbar() {
 
                 {/* Mobile Menu Button */}
                 <button
-                    className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all duration-300"
+                    className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-primary-400 hover:bg-slate-800/50 transition-all duration-300"
                     onClick={toggleMobileMenu}
                     aria-label="Toggle menu"
                 >
@@ -262,8 +262,8 @@ export default function Navbar() {
                             to={link.href}
                             className={`block py-3 px-4 rounded-lg transition-all duration-300 font-medium ${
                                 isActive(link.href)
-                                    ? "text-cyan-400 bg-slate-800/50 border border-cyan-400/20"
-                                    : "text-slate-300 hover:text-cyan-400 hover:bg-slate-800/50"
+                                    ? "text-primary-400 bg-slate-800/50 border border-primary-400/20"
+                                    : "text-slate-300 hover:text-primary-400 hover:bg-slate-800/50"
                             }`}
                             onClick={closeMobileMenu}
                         >
@@ -296,7 +296,7 @@ export default function Navbar() {
                                             user.email}
                                     </div>
                                     {user.role && (
-                                        <div className="text-xs text-cyan-400 capitalize">
+                                        <div className="text-xs text-primary-400 capitalize">
                                             {user.role}
                                         </div>
                                     )}
@@ -312,7 +312,7 @@ export default function Navbar() {
                     ) : (
                         <div className="flex flex-col gap-3 pt-2">
                             <Link to="/login" onClick={closeMobileMenu}>
-                                <button className="w-full rounded-xl border border-cyan-400/70 bg-transparent px-5 py-3 font-bold text-slate-100 hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300">
+                                <button className="w-full rounded-xl border border-primary-400/70 bg-transparent px-5 py-3 font-bold text-slate-100 hover:bg-primary-400/10 hover:border-primary-400 transition-all duration-300">
                                     Masuk
                                 </button>
                             </Link>
